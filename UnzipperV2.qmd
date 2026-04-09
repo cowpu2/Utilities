@@ -1,0 +1,151 @@
+---
+title: "Unzipper"
+author: "Mike Proctor"
+date: "`r Sys.Date()`"
+format: gfm
+
+
+---
+
+This script, is designed to efficiently unzip  geospatial archives (ZIP files) 
+from the defined source_path. It performs a selective extraction based on the internal 
+folder structure of each ZIP: all Shapefiles (SHP) are flattened and aggregated 
+into a single unzipped/shp folder, while all File Geodatabases (FGDB) are 
+extracted, and their unique .gdb folder structure is preserved and moved into 
+the unzipped/fgdb folder, preventing data overwrites during the large-scale, 
+concurrent extraction.
+
+Gemini was abused extensively in the composition of these scripts.
+
+There is another version that uses parallel processing and is much faster.
+
+These were used primarily in working with files of land parcels downloaded from [TxGIO]<https://data.geographic.texas.gov/> using their bulk downloader.  The 
+zipfiles had shp files of parcels for each county as well as gdb files for each 
+county and one for the entire state.  The entire state is a little large to 
+work with conviently so I removed it before unzipping.  The destination folder 
+structure is the complex part of the script.  The gdb files for each county have
+to retain their name and get put in a fgdb folder.  The shape files were easier 
+to work with - they just ended up in a shp folder. 
+
+
+
+```{r}
+
+
+
+library(rprojroot)
+library(tictoc)
+library(beepr)
+
+base_path       <- find_rstudio_root_file()
+source_path     <- file.path(base_path, "source_data//")
+unzip_path        <- file.path(base_path, "unzipped//")
+zip_path        <- file.path(base_path, "zipped//")
+
+
+# Define the final destination folders for the extracted contents
+shp_destination_path <- file.path(unzip_path, "shp")
+fgdb_destination_path <- file.path(unzip_path, "fgdb")
+
+# Create the necessary destination folders
+dir.create(source_path, recursive = TRUE, showWarnings = FALSE)
+dir.create(shp_destination_path, recursive = TRUE, showWarnings = FALSE)
+dir.create(fgdb_destination_path, recursive = TRUE, showWarnings = FALSE)
+
+cat("--- Setup Complete ---\n")
+cat("Zips are expected in: ", zip_path, "\n")
+cat("Shapefiles will be extracted to: ", shp_destination_path, "\n")
+cat("Geodatabases will be extracted to: ", fgdb_destination_path, "\n\n")
+
+
+
+# Get a list of all .zip files in the source directory
+zip_files <- list.files(
+  path = zip_path,
+  pattern = "\\.zip$", # Ensure only zip files are selected
+  full.names = TRUE # Get the full path for the unzip function
+)
+
+if (length(zip_files) == 0) {
+  stop("No .zip files found in the source_path. Please check the path and file existence.")
+}
+
+cat("Found", length(zip_files), "zip files. Starting selective extraction...\n")
+
+```
+
+```{r}
+
+# --- 3. Loop and Perform Selective Unzip ---
+tic()
+sapply(zip_files, function(zip_file) {
+  
+  zip_name <- basename(zip_file)
+  cat("\nProcessing:", zip_name, "\n")
+  
+  # A. Get the list of all files inside the current zip archive
+  internal_files <- unzip(zip_file, list = TRUE)$Name
+  
+  # B. Extract FGDB files (Preserve folder structure!)
+  fgdb_files_to_extract <- grep("^fgdb/", internal_files, value = TRUE)
+  
+  if (length(fgdb_files_to_extract) > 0) {
+    # 1. Temporarily extract the GDB to a scratch folder
+    temp_extract_path <- file.path(unzip_path, "temp_gdb_extract")
+    dir.create(temp_extract_path, showWarnings = FALSE)
+    
+    unzip(
+      zipfile = zip_file,
+      files = fgdb_files_to_extract,
+      exdir = temp_extract_path # Extract to a temporary folder
+      # *** DO NOT USE junkpaths = TRUE HERE! ***
+    )
+    
+    # 2. Identify the unique *.gdb folder that was just extracted (e.g., in temp_extract_path/fgdb)
+    extracted_fgdb_root <- file.path(temp_extract_path, "fgdb")
+    gdb_folder_name <- list.files(extracted_fgdb_root, pattern = "\\.gdb$", full.names = FALSE)
+    
+    if (length(gdb_folder_name) == 1) {
+      # 3. Move the unique GDB folder to the final destination
+      source_gdb_path <- file.path(extracted_fgdb_root, gdb_folder_name)
+      destination_gdb_path <- file.path(fgdb_destination_path, gdb_folder_name)
+      
+      file.rename(from = source_gdb_path, to = destination_gdb_path)
+      cat(sprintf("  -> Extracted and moved GDB: %s\n", gdb_folder_name))
+      
+    } else {
+       cat("  -> Warning: Could not find unique *.gdb folder to move.\n")
+    }
+    
+    # 4. Clean up the temporary directory
+    unlink(temp_extract_path, recursive = TRUE)
+    
+  } else {
+    cat("  -> No 'fgdb' folder/files found for extraction.\n")
+  }
+
+  # C. Extract SHP files (Flatten structure!)
+  shp_files_to_extract <- grep("^shp/", internal_files, value = TRUE)
+  
+  if (length(shp_files_to_extract) > 0) {
+    unzip(
+      zipfile = zip_file,
+      files = shp_files_to_extract, 
+      exdir = shp_destination_path, 
+      junkpaths = TRUE # Use junkpaths=TRUE to flatten 'shp/' contents
+    )
+    cat(sprintf("  -> Extracted %d SHP files to %s\n", length(shp_files_to_extract), basename(shp_destination_path)))
+  } else {
+    cat("  -> No 'shp' folder/files found for extraction.\n")
+  }
+  
+  return(TRUE)
+})
+
+toc()
+beep(sound = 4)
+
+# 235 files - 145.28 sec
+
+```
+
