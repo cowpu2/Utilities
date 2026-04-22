@@ -4,13 +4,11 @@ source("Setup.R")
 #oldDB_path <- "C:/Users/mike.proctor/GIS/Ft_Irwin_CR_EDA/Old Databases/"
 
 
-
-
 # convert windows path
-gsub("\\\\", "/", readClipboard())
+#gsub("\\\\", "/", readClipboard())
 
 #source_path <- "C:/Users/mike.proctor/GIS/source_data/PADUS4_1_State_TX_GDB_KMZ/"
-source_path <- "C:/Users/mike.proctor/GIS/Ft_Irwin_CR_EDA/Old Databases/"
+source_path <- "C:/Users/mike.proctor/GIS/Ft_Irwin_CR_EDA/Old Databases/done/"
 
 st_layers(paste0(source_path, "FY24_GIS1.gdb"))
 

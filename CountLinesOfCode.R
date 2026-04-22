@@ -15,7 +15,7 @@ parent_dir <- "C:/Users/mike.proctor/__R__"  # Change this to your target direct
 
 ## -----------------------------------------------------------------
 exclude_list <- c("archive","RAP", "Resume", "Setup", # these aren't projects - don't count these folders
-                  "Shiny","Spatial","Utilities")
+                  "Shiny","Spatial","Utilities", "ZZ_Docs")
 ## ----------------------------------------------------------------------
 
 
@@ -280,7 +280,16 @@ if (nrow(r_results$details) > 0 || nrow(py_results$details) > 0) {
   cat("DETAILED VIEW BY FOLDER\n")
   cat(rep("-", 80), "\n", sep = "")
 
-  for (i in 1:nrow(folder_summary)) {
+  # for (i in 1:nrow(folder_summary)) {
+  #   row <- folder_summary[i, ]
+  #   cat("\n", row$folder, ":\n", sep = "")
+  #   cat("  R files:      ", sprintf("%3d files, %6d lines", row$r_files, row$r_lines), "\n", sep = "")
+  #   cat("  Python files: ", sprintf("%3d files, %6d lines", row$py_files, row$py_lines), "\n", sep = "")
+  #   cat("  TOTAL:        ", sprintf("%3d files, %6d lines", row$total_files, row$total_lines), "\n", sep = "")
+  # }
+
+
+  for (i in seq_len(nrow(folder_summary))) {
     row <- folder_summary[i, ]
     cat("\n", row$folder, ":\n", sep = "")
     cat("  R files:      ", sprintf("%3d files, %6d lines", row$r_files, row$r_lines), "\n", sep = "")

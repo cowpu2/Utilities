@@ -5,6 +5,7 @@
 .Rproj
 .vscode
 .bat
+.ini
 
 /.quarto/
 /archive/

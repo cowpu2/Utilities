@@ -1,4 +1,5 @@
 # Unzipper_Parallel
+
 Mike Proctor
 2025-11-06
 
@@ -18,7 +19,7 @@ There is another version that doesn’t use parallel processing but is not
 as fast. 45 secs vs 145 secs for the same files
 
 These were used primarily in working with files of land parcels
-downloaded from \[TxGIO\]<https://data.geographic.texas.gov/> using
+downloaded from [TxGIO]<https://data.geographic.texas.gov/> using
 their bulk downloader. The zipfiles had shp files of parcels for each
 county as well as gdb files for each county and one for the entire
 state. The entire state is a little large to work with conviently so I
@@ -58,7 +59,7 @@ plan(multisession, workers = availableCores() - 1)
 cat("Parallel plan set using:", future::nbrOfWorkers(), "cores.\n")
 ```
 
-    Parallel plan set using: 21 cores.
+## Parallel plan set using: 21 cores
 
 ``` r
 # Re-run your directory creation to ensure destinations exist

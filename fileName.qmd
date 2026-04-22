@@ -1,0 +1,27 @@
+---
+title: "Untitled"
+date: today
+date-format: "YYYY-MM-DD"
+format: html
+---
+
+
+
+
+```{r}
+#| echo: false
+#| results: asis
+
+raw_name <- knitr::current_input()
+clean_name <- sub("\\.rmarkdown$", ".qmd", raw_name)
+
+clean_date <- format(Sys.time(), "%Y-%m-%d" )
+
+# 3. Write to the document
+#cat(paste0("**This File:** `", clean_name, "`  \n"))
+#cat(paste0("**Date:** ", clean_date))
+
+```
+
+**This file:** `r clean_name`
+
