@@ -5,9 +5,11 @@
 ## ======================================================================
 
 source("Setup.R")
-library(purrr)
 
-oldDB_path <- "C:/Users/mike.proctor/GIS/Ft_Irwin_CR_EDA/Old Databases"
+
+
+
+oldDB_path <- "C:/Users/mike.proctor/GIS/Ft_Irwin_CR_EDA/Old Databases/done/"
 
 
 fy24_layers <- st_layers(paste0(oldDB_path, "/FY24_GIS.gdb"))

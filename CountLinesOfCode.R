@@ -12,6 +12,7 @@ source("Setup.R")
 
 # Set the parent directory you want to search
 parent_dir <- "C:/Users/mike.proctor/__R__"  # Change this to your target directory
+#parent_dir <- "C:/Users/mike.proctor/__R__/Ft_Irwin_CR"  # Change this to your target directory
 
 ## -----------------------------------------------------------------
 exclude_list <- c("archive","RAP", "Resume", "Setup", # these aren't projects - don't count these folders
@@ -20,10 +21,6 @@ exclude_list <- c("archive","RAP", "Resume", "Setup", # these aren't projects - 
 
 
 # R Script to Count Lines of Code with Summary by Folder and Total
-
-# Load required package
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(stringr)
 
 # ============================================================================
 # STEP 1: List all folders and filter

@@ -98,7 +98,7 @@ sapply(zip_files, function(zip_file) {
       zipfile = zip_file,
       files = fgdb_files_to_extract,
       exdir = temp_extract_path # Extract to a temporary folder
-      # *** DO NOT USE junkpaths = TRUE HERE! ***
+    
     )
     
     # 2. Identify the unique *.gdb folder that was just extracted (e.g., in temp_extract_path/fgdb)

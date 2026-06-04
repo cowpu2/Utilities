@@ -34,7 +34,7 @@ rm(list = c("package", "Package_list"))
 
 base_path       <- here()
 source_path     <- here("source_data")
-plot_path       <- here("plots")
+#plot_path       <- here("plots")
 csv_path        <- here("csv_output")
 
 # convert windows path

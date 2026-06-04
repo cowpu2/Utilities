@@ -6,6 +6,10 @@
 .vscode
 .bat
 .ini
+.gitignore
+.csv
+
+
 
 /.quarto/
 /archive/
