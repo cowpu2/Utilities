@@ -11,12 +11,13 @@
 source("Setup.R")
 
 # Set the parent directory you want to search
-parent_dir <- "C:/Users/mike.proctor/__R__"  # Change this to your target directory
+#parent_dir <- "C:/Users/mike.proctor/__R__"  # Change this to your target directory
 #parent_dir <- "C:/Users/mike.proctor/__R__/Ft_Irwin_CR"  # Change this to your target directory
+parent_dir <- "C:/Users/mike.proctor/mcps/local_file_catalog" 
 
 ## -----------------------------------------------------------------
 exclude_list <- c("archive","RAP", "Resume", "Setup", # these aren't projects - don't count these folders
-                  "Shiny","Spatial","Utilities", "ZZ_Docs")
+                  "Shiny","Spatial","Utilities", "ZZ_Docs", "__pycache__")
 ## ----------------------------------------------------------------------
 
 
@@ -35,7 +36,10 @@ cat("Found", length(all_folders), "folders:\n")
 print(all_folders)
 
 
-folders_to_analyze <- all_folders[!all_folders %in% exclude_list]
+folders_to_analyze <- c(
+  ".",
+  all_folders[!all_folders %in% exclude_list]
+)
 
 
 cat("\nFolders selected for analysis:\n")
@@ -137,7 +141,8 @@ count_lines_in_files <- function(folders, extensions, parent_path = ".", languag
   )
 
   for (folder in folders) {
-    folder_path <- file.path(parent_path, folder)
+    folder_path <- if (folder == ".") parent_path else file.path(parent_path, folder)
+    folder_label <- if (folder == ".") "(parent_dir)" else folder
 
     if (!dir.exists(folder_path)) {
       warning(paste("Folder does not exist:", folder_path))
@@ -174,7 +179,7 @@ count_lines_in_files <- function(folders, extensions, parent_path = ".", languag
         file_count <- file_count + 1
 
         details <- rbind(details, data.frame(
-          folder = folder,
+          folder = folder_label,
           file = basename(file),
           lines_no_comments = lines_no_comments,
           lines_with_comments = lines_with_comments,
